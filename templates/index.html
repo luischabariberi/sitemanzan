@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1000">
+    <title>{{ business.name }} | Êxodo Barbearia - Manzan</title>
+    <meta
+        name="description"
+        content="{{ business.name }} entrega uma experiencia premium com corte, barba e atendimento pensado para homens que valorizam presenca."
+    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page-loader" aria-hidden="true">
+        <div class="page-loader__content">
+            <img
+                src="{{ url_for('static', filename='logo-exodo-barbearia.png') }}"
+                alt="Logo {{ business.name }}"
+                class="page-loader__logo"
+            >
+            <div class="page-loader__bar">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-shell">
+        <header class="site-header">
+            <a href="#top" class="brand-mark">
+                <img
+                    src="{{ url_for('static', filename='logo-exodo-barbearia.png') }}"
+                    alt="Logo {{ business.name }}"
+                    class="brand-mark__logo"
+                >
+            </a>
+
+            <nav class="site-nav">
+                <a href="#servicos">Serviços</a>
+                <a href="#estrutura">Estrutura</a>
+                <a href="#resultados">Resultados</a>
+                <a href="#contato">Contato</a>
+            </nav>
+
+            <a class="button button--ghost" href="{{ business.whatsapp_link }}">Agendar agora</a>
+        </header>
+
+        <main id="top">
+            <section class="hero section">
+                <div class="hero__copy reveal">
+                    <span class="eyebrow">{{ business.badge }}</span>
+                    <img
+                        src="{{ url_for('static', filename='logo-exodo-barbearia.png') }}"
+                        alt="Logo {{ business.name }}"
+                        class="hero__logo"
+                    >
+                    <p>{{ business.description }}</p>
+
+                    <div class="hero__actions">
+                        <a class="button" href="#resultados">{{ business.hero_cta }}</a>
+                        <a class="button button--secondary" href="{{ business.whatsapp_link }}">Agende seu horário</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section about-section" id="servicos">
+                <div class="about-section__media reveal">
+                    <img
+                        src="{{ url_for('static', filename='mascote-manzan.png') }}"
+                        alt="Mascote da Manzan Barber"
+                        class="about-section__image"
+                    >
+                </div>
+
+                <div class="about-section__copy reveal">
+                    <span class="eyebrow">{{ about_me.eyebrow }}</span>
+                    <h2>{{ about_me.title }}</h2>
+
+                    <div class="about-section__text">
+                        {% for paragraph in about_me.paragraphs %}
+                        <p>{{ paragraph }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <a class="button" href="{{ business.whatsapp_link }}">Agende seu horário</a>
+                </div>
+            </section>
+
+            <section class="section values-section">
+                <div class="section-heading reveal">
+                    <span class="eyebrow">Serviços e valores</span>
+                    <h2>Escolha o serviço ideal para o seu estilo.</h2>
+                </div>
+
+                <div class="pricing-grid">
+                    {% for item in pricing %}
+                    <a class="pricing-card reveal" href="{{ business.whatsapp_link }}" target="_blank" rel="noreferrer">
+                        <h3>{{ item.name }}</h3>
+                        <strong>{{ item.price }}</strong>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="section split-section" id="estrutura">
+                <div class="split-section__media reveal">
+                    <img src="{{ url_for('static', filename='foto-barbearia.jpg') }}" alt="Ambiente da barbearia Manzan">
+                </div>
+
+                <div class="split-section__copy reveal">
+                    <span class="eyebrow">Diferenciais</span>
+                    <h2>Um ambiente onde você se sente em casa, com toque clássico e atendimento exclusivo.</h2>
+                    <div class="highlight-list">
+                        {% for highlight in highlights %}
+                        <div class="highlight-item">
+                            <span></span>
+                            <p>{{ highlight }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a class="button" href="{{ business.whatsapp_link }}">Reservar horário</a>
+                </div>
+            </section>
+
+            <section class="section offer-section reveal">
+                <div class="offer-section__content">
+                    <span class="eyebrow">O que faz a diferença</span>
+                    <h2>{{ business.offer_title }}</h2>
+                    <p>{{ business.offer_text|capitalize }}</p>
+                </div>
+                <a class="button button--light" href="{{ business.whatsapp_link }}">Agendar experiência</a>
+            </section>
+
+            <section class="section gallery-section" id="resultados">
+                <div class="section-heading reveal">
+                    <span class="eyebrow">Resultados e ambiente</span>
+                    <h2>Conheça de perto o estilo, o ambiente e a identidade da barbearia.</h2>
+                </div>
+
+                <div class="gallery-grid">
+                    {% for item in gallery %}
+                    <figure class="gallery-card reveal">
+                        <img src="{{ item.src }}" alt="{{ item.alt }}">
+                    </figure>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="section testimonials-section">
+                <div class="section-heading reveal">
+                    <span class="eyebrow">Quem já veio volta</span>
+                    <h2>Qualidade de serviço e atendimento de excelência fazem o cliente voltar.</h2>
+                </div>
+
+                <div class="testimonials-grid">
+                    {% for testimonial in testimonials %}
+                    <article class="testimonial-card reveal">
+                        <p>"{{ testimonial.quote }}"</p>
+                        <strong>{{ testimonial.author }}</strong>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                <form class="review-form reveal">
+                    <div class="review-form__header">
+                        <span class="eyebrow">Deixe sua avaliacao</span>
+                        <h3>Conte como foi sua experiencia na barbearia.</h3>
+                    </div>
+
+                    <div class="review-form__stars" role="radiogroup" aria-label="Avaliação em estrelas">
+                        <input type="radio" id="star5" name="rating" value="5">
+                        <label for="star5" aria-label="5 estrelas">&#9733;</label>
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star4" aria-label="4 estrelas">&#9733;</label>
+                        <input type="radio" id="star3" name="rating" value="3">
+                        <label for="star3" aria-label="3 estrelas">&#9733;</label>
+                        <input type="radio" id="star2" name="rating" value="2">
+                        <label for="star2" aria-label="2 estrelas">&#9733;</label>
+                        <input type="radio" id="star1" name="rating" value="1">
+                        <label for="star1" aria-label="1 estrela">&#9733;</label>
+                    </div>
+
+                    <textarea
+                        class="review-form__textarea"
+                        name="comment"
+                        rows="5"
+                        placeholder="Digite aqui seu comentario..."
+                    ></textarea>
+
+                    <button type="submit" class="button">Enviar avaliacao</button>
+                </form>
+            </section>
+
+            <section class="section contact-section" id="contato">
+                <div class="contact-card reveal">
+                    <span class="eyebrow">Localização</span>
+                    <h2>Agende seu horário e viva uma experiência de barbearia completa.</h2>
+                    <p>{{ business.address }}</p>
+                    <ul class="contact-list">
+                        <li>{{ business.hours_week }}</li>
+                        <li>{{ business.hours_sat }}</li>
+                        <li>{{ business.hours_sun }}</li>
+                    </ul>
+                    <div class="contact-actions">
+                        <a class="button" href="{{ business.whatsapp_link }}">Chamar no WhatsApp</a>
+                        <a class="button button--secondary" href="{{ business.maps_link }}" target="_blank" rel="noreferrer">Abrir no mapa</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <p>&copy; 2026 {{ business.name }}. Todos os direitos reservados.</p>
+        </footer>
+
+        <a class="floating-whatsapp" href="{{ business.whatsapp_link }}" aria-label="Falar no WhatsApp">
+            WA
+        </a>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
