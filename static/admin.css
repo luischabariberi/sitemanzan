@@ -1,0 +1,365 @@
+:root {
+    --bg: #0e0c0a;
+    --panel: #171310;
+    --panel-soft: #201914;
+    --line: rgba(219, 178, 124, 0.18);
+    --text: #f3eee7;
+    --muted: #bfaf9c;
+    --brand: #d8ab72;
+    --danger: #cf5d5d;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: linear-gradient(180deg, #0f0c0a 0%, #090705 100%);
+    color: var(--text);
+    font-family: Manrope, sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+input,
+textarea,
+select,
+button {
+    font: inherit;
+}
+
+.admin-login-page,
+.admin-page {
+    min-height: 100vh;
+}
+
+.admin-login {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+.admin-card,
+.admin-section,
+.admin-sidebar {
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: rgba(22, 17, 13, 0.92);
+    box-shadow: 0 26px 90px rgba(0, 0, 0, 0.34);
+}
+
+.admin-card {
+    width: min(100%, 460px);
+    padding: 32px;
+}
+
+.admin-card h1,
+.admin-section h2 {
+    margin: 10px 0 12px;
+    font: 700 clamp(2rem, 4vw, 3rem) "Cormorant Garamond", serif;
+    line-height: 1;
+}
+
+.admin-card p,
+.admin-hint {
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.admin-eyebrow {
+    color: var(--brand);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.admin-form,
+.admin-grid-form,
+.admin-upload-form,
+.admin-gallery-card {
+    display: grid;
+    gap: 16px;
+}
+
+.admin-form label,
+.admin-grid-form label,
+.admin-upload-form label,
+.admin-gallery-card label {
+    display: grid;
+    gap: 8px;
+}
+
+.admin-grid-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-grid-form__full {
+    grid-column: 1 / -1;
+}
+
+.admin-layout {
+    width: min(1400px, calc(100% - 32px));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 20px;
+    padding: 20px 0 32px;
+}
+
+.admin-topbar {
+    width: min(1400px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 24px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.admin-topbar h1 {
+    margin: 8px 0 0;
+    font: 700 2.5rem "Cormorant Garamond", serif;
+}
+
+.admin-topbar__actions {
+    display: flex;
+    gap: 12px;
+}
+
+.admin-topbar__actions a,
+.admin-submit,
+.admin-form button,
+.admin-inline-form button,
+.admin-delete-form button,
+.admin-review-card__actions button,
+.admin-gallery-card button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 18px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: linear-gradient(135deg, #8c5d2d, var(--brand));
+    color: #17120d;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.admin-topbar__actions a:last-child,
+.admin-delete-form button,
+.admin-danger {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+    padding: 18px;
+    display: grid;
+    gap: 10px;
+}
+
+.admin-sidebar a {
+    padding: 12px 14px;
+    border-radius: 14px;
+    color: var(--muted);
+}
+
+.admin-sidebar a:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+}
+
+.admin-content {
+    display: grid;
+    gap: 20px;
+}
+
+.admin-section {
+    padding: 24px;
+}
+
+.admin-section__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.admin-flashes {
+    display: grid;
+    gap: 10px;
+    margin: 18px 0;
+}
+
+.admin-flashes--page {
+    width: min(1400px, calc(100% - 32px));
+    margin: 16px auto 0;
+}
+
+.admin-flash {
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-flash--success {
+    border-color: rgba(61, 196, 109, 0.28);
+}
+
+.admin-flash--error {
+    border-color: rgba(214, 78, 78, 0.34);
+}
+
+.admin-preview {
+    width: min(100%, 320px);
+    border-radius: 18px;
+    border: 1px solid var(--line);
+}
+
+.admin-list {
+    display: grid;
+    gap: 12px;
+}
+
+.admin-pricing-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 110px;
+    gap: 12px;
+    align-items: center;
+}
+
+.admin-inline-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 180px 120px;
+    gap: 12px;
+    align-items: center;
+    margin: 0;
+}
+
+.admin-inline-form--add {
+    margin-top: 18px;
+}
+
+.admin-delete-form {
+    margin: 0;
+    width: 110px;
+}
+
+.admin-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.admin-gallery-card {
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--line);
+}
+
+.admin-gallery-card h3 {
+    margin: 0 0 8px;
+}
+
+.admin-review-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.admin-review-card {
+    padding: 20px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--line);
+}
+
+.admin-review-card__top,
+.admin-review-card__actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.admin-review-card p {
+    color: var(--muted);
+    line-height: 1.8;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(219, 178, 124, 0.16);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: rgba(219, 178, 124, 0.36);
+    box-shadow: 0 0 0 3px rgba(219, 178, 124, 0.08);
+}
+
+@media (max-width: 1080px) {
+    .admin-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+        position: static;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .admin-gallery-grid,
+    .admin-review-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .admin-grid-form,
+    .admin-inline-form,
+    .admin-pricing-row {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-delete-form {
+        margin: 0;
+        width: auto;
+    }
+
+    .admin-topbar,
+    .admin-section__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-sidebar {
+        grid-template-columns: 1fr 1fr;
+    }
+}

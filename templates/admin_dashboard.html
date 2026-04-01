@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin | Manzan Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body class="admin-page">
+    <header class="admin-topbar">
+        <div>
+            <span class="admin-eyebrow">Painel administrador</span>
+            <h1>Manzan Barber</h1>
+        </div>
+        <div class="admin-topbar__actions">
+            <a href="{{ url_for('home') }}" target="_blank" rel="noreferrer">Ver site</a>
+            <a href="{{ url_for('admin_logout') }}">Sair</a>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="admin-flashes admin-flashes--page">
+        {% for category, message in messages %}
+        <div class="admin-flash admin-flash--{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="admin-layout">
+        <aside class="admin-sidebar">
+            <a href="#settings">Informacoes</a>
+            <a href="#structure">Estrutura</a>
+            <a href="#pricing">Servicos</a>
+            <a href="#gallery">Galeria</a>
+            <a href="#reviews">Comentarios</a>
+        </aside>
+
+        <section class="admin-content">
+            <section class="admin-section" id="settings">
+                <div class="admin-section__header">
+                    <div>
+                        <span class="admin-eyebrow">Informacoes gerais</span>
+                        <h2>Textos, links e horarios</h2>
+                    </div>
+                    <p class="admin-hint">Senha atual do painel: <strong>{{ admin_password_hint }}</strong>. Troque depois em `ADMIN_PASSWORD`.</p>
+                </div>
+
+                <form method="post" action="{{ url_for('update_settings') }}" class="admin-grid-form">
+                    <label>
+                        <span>Nome do negocio</span>
+                        <input type="text" name="business_name" value="{{ business.name }}">
+                    </label>
+                    <label>
+                        <span>Texto principal do hero</span>
+                        <input type="text" name="badge" value="{{ business.badge }}">
+                    </label>
+                    <label class="admin-grid-form__full">
+                        <span>Descricao principal</span>
+                        <textarea name="description" rows="3">{{ business.description }}</textarea>
+                    </label>
+                    <label>
+                        <span>Endereco</span>
+                        <input type="text" name="address" value="{{ business.address }}">
+                    </label>
+                    <label>
+                        <span>Horario semana</span>
+                        <input type="text" name="hours_week" value="{{ business.hours_week }}">
+                    </label>
+                    <label>
+                        <span>Horario sabado</span>
+                        <input type="text" name="hours_sat" value="{{ business.hours_sat }}">
+                    </label>
+                    <label>
+                        <span>Horario domingo</span>
+                        <input type="text" name="hours_sun" value="{{ business.hours_sun }}">
+                    </label>
+                    <label>
+                        <span>Link WhatsApp</span>
+                        <input type="url" name="whatsapp_link" value="{{ business.whatsapp_link }}">
+                    </label>
+                    <label>
+                        <span>Link agendamento</span>
+                        <input type="url" name="horario_link" value="{{ business.horario_link }}">
+                    </label>
+                    <label>
+                        <span>Link mapa</span>
+                        <input type="url" name="maps_link" value="{{ business.maps_link }}">
+                    </label>
+                    <label>
+                        <span>Titulo oferta</span>
+                        <input type="text" name="offer_title" value="{{ business.offer_title }}">
+                    </label>
+                    <label>
+                        <span>Texto botao portfolio</span>
+                        <input type="text" name="hero_cta" value="{{ business.hero_cta }}">
+                    </label>
+                    <label class="admin-grid-form__full">
+                        <span>Texto da oferta</span>
+                        <textarea name="offer_text" rows="2">{{ business.offer_text }}</textarea>
+                    </label>
+
+                    <label>
+                        <span>Sobre mim - topo</span>
+                        <input type="text" name="about_eyebrow" value="{{ about_me.eyebrow }}">
+                    </label>
+                    <label class="admin-grid-form__full">
+                        <span>Sobre mim - titulo</span>
+                        <textarea name="about_title" rows="2">{{ about_me.title }}</textarea>
+                    </label>
+                    <label class="admin-grid-form__full">
+                        <span>Sobre mim - paragrafo 1</span>
+                        <textarea name="about_paragraph_1" rows="3">{{ about_me.paragraphs[0] }}</textarea>
+                    </label>
+                    <label class="admin-grid-form__full">
+                        <span>Sobre mim - paragrafo 2</span>
+                        <textarea name="about_paragraph_2" rows="3">{{ about_me.paragraphs[1] }}</textarea>
+                    </label>
+                    <label class="admin-grid-form__full">
+                        <span>Sobre mim - paragrafo 3</span>
+                        <textarea name="about_paragraph_3" rows="3">{{ about_me.paragraphs[2] }}</textarea>
+                    </label>
+
+                    <button type="submit" class="admin-submit">Salvar informacoes</button>
+                </form>
+            </section>
+
+            <section class="admin-section" id="structure">
+                <div class="admin-section__header">
+                    <div>
+                        <span class="admin-eyebrow">Estrutura</span>
+                        <h2>Foto e destaques da estrutura</h2>
+                    </div>
+                </div>
+
+                <form method="post" action="{{ url_for('update_settings') }}" class="admin-grid-form">
+                    <label class="admin-grid-form__full">
+                        <span>Titulo da estrutura</span>
+                        <textarea name="structure_title" rows="2">{{ structure.title }}</textarea>
+                    </label>
+                    {% for highlight in structure.highlights %}
+                    <label class="admin-grid-form__full">
+                        <span>Destaque {{ loop.index }}</span>
+                        <input type="text" name="structure_highlight_{{ loop.index }}" value="{{ highlight }}">
+                    </label>
+                    {% endfor %}
+                    <button type="submit" class="admin-submit">Salvar destaques</button>
+                </form>
+
+                <form method="post" action="{{ url_for('update_structure_image') }}" enctype="multipart/form-data" class="admin-upload-form">
+                    <div>
+                        <span class="admin-eyebrow">Foto atual</span>
+                        <img src="{{ structure.image }}" alt="Foto da estrutura" class="admin-preview">
+                    </div>
+                    <label>
+                        <span>Nova foto da estrutura</span>
+                        <input type="file" name="structure_image" accept="image/*" required>
+                    </label>
+                    <button type="submit" class="admin-submit">Atualizar foto</button>
+                </form>
+            </section>
+
+            <section class="admin-section" id="pricing">
+                <div class="admin-section__header">
+                    <div>
+                        <span class="admin-eyebrow">Servicos e valores</span>
+                        <h2>Edite nomes e precos</h2>
+                    </div>
+                </div>
+
+                <div class="admin-list">
+                    {% for item in pricing %}
+                    <div class="admin-pricing-row">
+                        <form method="post" action="{{ url_for('update_pricing', item_id=item.id) }}" class="admin-inline-form">
+                            <input type="text" name="name" value="{{ item.name }}" required>
+                            <input type="text" name="price" value="{{ item.price }}" required>
+                            <button type="submit">Salvar</button>
+                        </form>
+                        <form method="post" action="{{ url_for('delete_pricing', item_id=item.id) }}" class="admin-delete-form">
+                            <button type="submit">Excluir</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <form method="post" action="{{ url_for('add_pricing') }}" class="admin-inline-form admin-inline-form--add">
+                    <input type="text" name="name" placeholder="Novo servico" required>
+                    <input type="text" name="price" placeholder="R$0,00" required>
+                    <button type="submit">Adicionar</button>
+                </form>
+            </section>
+
+            <section class="admin-section" id="gallery">
+                <div class="admin-section__header">
+                    <div>
+                        <span class="admin-eyebrow">Resultados e ambiente</span>
+                        <h2>Fotos e video da galeria</h2>
+                    </div>
+                </div>
+
+                <div class="admin-gallery-grid">
+                    {% for card in gallery %}
+                    <form method="post" action="{{ url_for('update_gallery_card', card_id=card.id) }}" enctype="multipart/form-data" class="admin-gallery-card">
+                        <h3>Card {{ loop.index }}</h3>
+                        <label>
+                            <span>Tipo</span>
+                            <select name="type">
+                                <option value="slideshow" {% if card.type == 'slideshow' %}selected{% endif %}>Fotos rotativas</option>
+                                <option value="video" {% if card.type == 'video' %}selected{% endif %}>Video</option>
+                            </select>
+                        </label>
+                        <label>
+                            <span>Texto alternativo</span>
+                            <input type="text" name="alt" value="{{ card.alt }}">
+                        </label>
+
+                        {% if card.type == 'slideshow' %}
+                        <label>
+                            <span>URLs das fotos (uma por linha)</span>
+                            <textarea name="media_urls" rows="6">{% for image in card.images %}{{ image }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                        </label>
+                        <label>
+                            <span>Adicionar fotos</span>
+                            <input type="file" name="image_files" accept="image/*" multiple>
+                        </label>
+                        {% else %}
+                        <label>
+                            <span>URL do video</span>
+                            <input type="url" name="video_url" value="{{ card.video }}">
+                        </label>
+                        <label>
+                            <span>Upload de video</span>
+                            <input type="file" name="video_file" accept="video/*">
+                        </label>
+                        <label>
+                            <span>URL da capa</span>
+                            <input type="url" name="poster_url" value="{{ card.poster }}">
+                        </label>
+                        <label>
+                            <span>Upload da capa</span>
+                            <input type="file" name="poster_file" accept="image/*">
+                        </label>
+                        {% endif %}
+
+                        <button type="submit" class="admin-submit">Salvar card</button>
+                    </form>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="admin-section" id="reviews">
+                <div class="admin-section__header">
+                    <div>
+                        <span class="admin-eyebrow">Comentarios</span>
+                        <h2>Aprove ou esconda avaliacoes</h2>
+                    </div>
+                </div>
+
+                <div class="admin-review-list">
+                    {% for review in reviews %}
+                    <article class="admin-review-card">
+                        <div class="admin-review-card__top">
+                            <strong>{{ review.author }}</strong>
+                            <span>{{ review.rating }} estrelas</span>
+                        </div>
+                        <p>{{ review.quote }}</p>
+                        <div class="admin-review-card__actions">
+                            <form method="post" action="{{ url_for('toggle_review', review_id=review.id) }}">
+                                <button type="submit">{{ 'Ocultar' if review.approved else 'Aprovar' }}</button>
+                            </form>
+                            <form method="post" action="{{ url_for('delete_review', review_id=review.id) }}">
+                                <button type="submit" class="admin-danger">Excluir</button>
+                            </form>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+        </section>
+    </main>
+</body>
+</html>
