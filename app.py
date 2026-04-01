@@ -19,7 +19,8 @@ def home():
         "hours_week": "Seg a Sex - 09:00 as 19:00",
         "hours_sat": "Sábado - 09:00 as 18:00",
         "hours_sun": "Domingo - Fechado",
-        "whatsapp_link": "https://sites.appbarber.com.br/agendamento/manzanbarbearia-3xbv?fbclid=PAVERFWAQ4zwVleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAad50Ln_bvW2hXom66ewBmtL1LknDMmIwy-n94fWAUV_dRCgDCF4p-D3vn3Apw_aem_fZp7wKHpv1D32TpYn-6-wQ",
+        "whatsapp_link": "https://api.whatsapp.com/send?phone=5534999222926&text=",
+        "horario_link": "https://sites.appbarber.com.br/agendamento/manzanbarbearia-3xbv?fbclid=PAVERFWAQ4zwVleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAad50Ln_bvW2hXom66ewBmtL1LknDMmIwy-n94fWAUV_dRCgDCF4p-D3vn3Apw_aem_fZp7wKHpv1D32TpYn-6-wQ",
         "maps_link": "https://maps.app.goo.gl/CkKm6DkmB15PJuP78?g_st=iw",
         "offer_title": "Experiência Clássica",
         "offer_text": "Toalha quente, navalha, cuidado nos detalhes e atendimento exclusivo.",
@@ -73,20 +74,37 @@ def home():
 
     gallery = [
         {
-            "src": "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=900&q=80",
-            "alt": "Barbeiro finalizando corte masculino com maquina",
+            "type": "slideshow",
+            "alt": "Corte masculino sendo finalizado na barbearia",
+            "images": [
+                "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
+            ],
         },
         {
-            "src": "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80",
-            "alt": "Cliente em cadeira de barbearia premium",
+            "type": "slideshow",
+            "alt": "Cliente recebendo acabamento de barba",
+            "images": [
+                "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1512690459411-b0fd1c86b8ce?auto=format&fit=crop&w=900&q=80",
+            ],
         },
         {
-            "src": "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=900&q=80",
-            "alt": "Detalhe de corte degrade masculino",
+            "type": "slideshow",
+            "alt": "Ambiente interno da barbearia",
+            "images": [
+                "/static/foto-barbearia.jpg",
+                "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80",
+            ],
         },
         {
-            "src": "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=900&q=80",
-            "alt": "Interior de barbearia com visual sofisticado",
+            "type": "video",
+            "poster": "/static/foto-barbearia.jpg",
+            "video": "https://www.w3schools.com/html/mov_bbb.mp4",
+            "alt": "Video de apresentacao da barbearia",
         },
     ]
 

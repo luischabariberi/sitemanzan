@@ -526,20 +526,39 @@ a {
 .gallery-card {
     overflow: hidden;
     min-height: 320px;
+    position: relative;
     border-radius: 24px;
     border: 1px solid var(--line);
     box-shadow: var(--shadow);
     background: #120e0b;
 }
 
-.gallery-card img {
+.gallery-card img,
+.gallery-video {
     height: 100%;
+    width: 100%;
     object-fit: cover;
-    transition: transform 220ms ease;
+    transition: transform 500ms ease, opacity 500ms ease;
 }
 
-.gallery-card:hover img {
+.gallery-card:hover img,
+.gallery-card:hover .gallery-video {
     transform: scale(1.04);
+}
+
+.gallery-card__badge {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(8, 6, 5, 0.72);
+    border: 1px solid rgba(219, 178, 124, 0.2);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .testimonial-card strong {
