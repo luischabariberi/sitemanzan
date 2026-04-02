@@ -1,5 +1,4 @@
 import os
-import sqlite3
 import uuid
 from functools import wraps
 from pathlib import Path
@@ -7,18 +6,18 @@ from pathlib import Path
 from flask import (
     Flask,
     flash,
-    g,
     redirect,
     render_template,
     request,
     session,
     url_for,
 )
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from werkzeug.utils import secure_filename
 
 
 BASE_DIR = Path(__file__).resolve().parent
-DATABASE_PATH = BASE_DIR / "site.db"
 UPLOAD_DIR = BASE_DIR / "static" / "uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -82,19 +81,19 @@ DEFAULT_REVIEWS = [
         "Rafael M.",
         "Ambiente impecavel, atendimento pontual e o corte sempre vem exatamente como eu preciso.",
         5,
-        1,
+        True,
     ),
     (
         "Lucas A.",
         "A barba ficou muito acima do que eu encontrava em outras barbearias. Virou meu lugar fixo.",
         5,
-        1,
+        True,
     ),
     (
         "Thiago S.",
         "Da recepcao ao acabamento final, da para sentir que tudo foi pensado para entregar nivel premium.",
         5,
-        1,
+        True,
     ),
 ]
 
@@ -142,124 +141,69 @@ DEFAULT_GALLERY = [
 ]
 
 
+def normalized_database_url():
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        return database_url
+    return f"sqlite:///{(BASE_DIR / 'site.db').as_posix()}"
+
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "manzan-admin-secret")
+app.config["SQLALCHEMY_DATABASE_URI"] = normalized_database_url()
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
 
 
-def get_db():
-    if "db" not in g:
-        g.db = sqlite3.connect(DATABASE_PATH)
-        g.db.row_factory = sqlite3.Row
-    return g.db
+class Setting(db.Model):
+    __tablename__ = "settings"
+    key = db.Column(db.String(120), primary_key=True)
+    value = db.Column(db.Text, nullable=False)
 
 
-@app.teardown_appcontext
-def close_db(_error):
-    db = g.pop("db", None)
-    if db is not None:
-        db.close()
+class PricingItem(db.Model):
+    __tablename__ = "pricing"
+    id = db.Column(db.Integer, primary_key=True)
+    position = db.Column(db.Integer, nullable=False, default=0)
+    name = db.Column(db.String(255), nullable=False)
+    price = db.Column(db.String(100), nullable=False)
 
 
-def init_db():
-    db = sqlite3.connect(DATABASE_PATH)
-    db.row_factory = sqlite3.Row
-    cursor = db.cursor()
+class Review(db.Model):
+    __tablename__ = "reviews"
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.String(80), nullable=False)
+    quote = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer, nullable=False, default=5)
+    approved = db.Column(db.Boolean, nullable=False, default=False)
+    created_at = db.Column(db.DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
-    cursor.executescript(
-        """
-        CREATE TABLE IF NOT EXISTS settings (
-            key TEXT PRIMARY KEY,
-            value TEXT NOT NULL
-        );
 
-        CREATE TABLE IF NOT EXISTS pricing (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            position INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            price TEXT NOT NULL
-        );
-
-        CREATE TABLE IF NOT EXISTS reviews (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            author TEXT NOT NULL,
-            quote TEXT NOT NULL,
-            rating INTEGER NOT NULL,
-            approved INTEGER NOT NULL DEFAULT 0,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        );
-
-        CREATE TABLE IF NOT EXISTS gallery_cards (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            position INTEGER NOT NULL,
-            type TEXT NOT NULL,
-            alt TEXT NOT NULL,
-            video_url TEXT DEFAULT '',
-            poster_url TEXT DEFAULT ''
-        );
-
-        CREATE TABLE IF NOT EXISTS gallery_media (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            card_id INTEGER NOT NULL,
-            position INTEGER NOT NULL,
-            media_url TEXT NOT NULL,
-            FOREIGN KEY(card_id) REFERENCES gallery_cards(id) ON DELETE CASCADE
-        );
-        """
+class GalleryCard(db.Model):
+    __tablename__ = "gallery_cards"
+    id = db.Column(db.Integer, primary_key=True)
+    position = db.Column(db.Integer, nullable=False, default=0)
+    type = db.Column(db.String(40), nullable=False)
+    alt = db.Column(db.String(255), nullable=False)
+    video_url = db.Column(db.Text, nullable=False, default="")
+    poster_url = db.Column(db.Text, nullable=False, default="")
+    media_items = db.relationship(
+        "GalleryMedia",
+        backref="card",
+        cascade="all, delete-orphan",
+        order_by="GalleryMedia.position",
+        lazy=True,
     )
 
-    existing_settings = {
-        row["key"] for row in cursor.execute("SELECT key FROM settings").fetchall()
-    }
-    for key, value in DEFAULT_SETTINGS.items():
-        if key not in existing_settings:
-            cursor.execute(
-                "INSERT INTO settings (key, value) VALUES (?, ?)",
-                (key, value),
-            )
 
-    pricing_count = cursor.execute("SELECT COUNT(*) FROM pricing").fetchone()[0]
-    if pricing_count == 0:
-        for index, (name, price) in enumerate(DEFAULT_PRICING, start=1):
-            cursor.execute(
-                "INSERT INTO pricing (position, name, price) VALUES (?, ?, ?)",
-                (index, name, price),
-            )
-
-    reviews_count = cursor.execute("SELECT COUNT(*) FROM reviews").fetchone()[0]
-    if reviews_count == 0:
-        cursor.executemany(
-            "INSERT INTO reviews (author, quote, rating, approved) VALUES (?, ?, ?, ?)",
-            DEFAULT_REVIEWS,
-        )
-
-    gallery_count = cursor.execute("SELECT COUNT(*) FROM gallery_cards").fetchone()[0]
-    if gallery_count == 0:
-        for index, item in enumerate(DEFAULT_GALLERY, start=1):
-            cursor.execute(
-                """
-                INSERT INTO gallery_cards (position, type, alt, video_url, poster_url)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                (
-                    index,
-                    item["type"],
-                    item["alt"],
-                    item["video_url"],
-                    item["poster_url"],
-                ),
-            )
-            card_id = cursor.lastrowid
-            for media_index, media_url in enumerate(item["media"], start=1):
-                cursor.execute(
-                    """
-                    INSERT INTO gallery_media (card_id, position, media_url)
-                    VALUES (?, ?, ?)
-                    """,
-                    (card_id, media_index, media_url),
-                )
-
-    db.commit()
-    db.close()
+class GalleryMedia(db.Model):
+    __tablename__ = "gallery_media"
+    id = db.Column(db.Integer, primary_key=True)
+    card_id = db.Column(db.Integer, db.ForeignKey("gallery_cards.id"), nullable=False)
+    position = db.Column(db.Integer, nullable=False, default=0)
+    media_url = db.Column(db.Text, nullable=False)
 
 
 def allowed_file(filename, allowed_extensions):
@@ -284,18 +228,16 @@ def save_upload(file_storage, folder_name, allowed_extensions):
 
 
 def setting_value(key, fallback=""):
-    row = get_db().execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
-    return row["value"] if row else fallback
+    row = db.session.get(Setting, key)
+    return row.value if row else fallback
 
 
 def set_setting(key, value):
-    get_db().execute(
-        """
-        INSERT INTO settings (key, value) VALUES (?, ?)
-        ON CONFLICT(key) DO UPDATE SET value = excluded.value
-        """,
-        (key, value),
-    )
+    row = db.session.get(Setting, key)
+    if row:
+        row.value = value
+    else:
+        db.session.add(Setting(key=key, value=value))
 
 
 def get_business_settings():
@@ -342,69 +284,69 @@ def get_structure_content():
 
 
 def get_pricing():
-    rows = get_db().execute(
-        "SELECT id, position, name, price FROM pricing ORDER BY position, id"
-    ).fetchall()
-    return [dict(row) for row in rows]
+    return [
+        {
+            "id": item.id,
+            "position": item.position,
+            "name": item.name,
+            "price": item.price,
+        }
+        for item in PricingItem.query.order_by(PricingItem.position, PricingItem.id).all()
+    ]
 
 
 def get_gallery_cards():
-    db = get_db()
-    cards = db.execute(
-        """
-        SELECT id, position, type, alt, video_url, poster_url
-        FROM gallery_cards
-        ORDER BY position, id
-        """
-    ).fetchall()
+    cards = GalleryCard.query.order_by(GalleryCard.position, GalleryCard.id).all()
     results = []
     for card in cards:
-        media_rows = db.execute(
-            """
-            SELECT id, position, media_url
-            FROM gallery_media
-            WHERE card_id = ?
-            ORDER BY position, id
-            """,
-            (card["id"],),
-        ).fetchall()
         results.append(
             {
-                "id": card["id"],
-                "position": card["position"],
-                "type": card["type"],
-                "alt": card["alt"],
-                "video": card["video_url"],
-                "poster": card["poster_url"],
-                "images": [row["media_url"] for row in media_rows],
-                "media_rows": [dict(row) for row in media_rows],
+                "id": card.id,
+                "position": card.position,
+                "type": card.type,
+                "alt": card.alt,
+                "video": card.video_url,
+                "poster": card.poster_url,
+                "images": [media.media_url for media in card.media_items],
+                "media_rows": [
+                    {"id": media.id, "position": media.position, "media_url": media.media_url}
+                    for media in card.media_items
+                ],
             }
         )
     return results
 
 
 def get_public_reviews():
-    rows = get_db().execute(
-        """
-        SELECT id, author, quote, rating
-        FROM reviews
-        WHERE approved = 1
-        ORDER BY id DESC
-        LIMIT 6
-        """
-    ).fetchall()
-    return [dict(row) for row in rows]
+    rows = (
+        Review.query.filter_by(approved=True)
+        .order_by(Review.id.desc())
+        .limit(6)
+        .all()
+    )
+    return [
+        {
+            "id": row.id,
+            "author": row.author,
+            "quote": row.quote,
+            "rating": row.rating,
+        }
+        for row in rows
+    ]
 
 
 def get_all_reviews():
-    rows = get_db().execute(
-        """
-        SELECT id, author, quote, rating, approved, created_at
-        FROM reviews
-        ORDER BY id DESC
-        """
-    ).fetchall()
-    return [dict(row) for row in rows]
+    return [
+        {
+            "id": row.id,
+            "author": row.author,
+            "quote": row.quote,
+            "rating": row.rating,
+            "approved": row.approved,
+            "created_at": row.created_at,
+        }
+        for row in Review.query.order_by(Review.id.desc()).all()
+    ]
 
 
 def admin_required(view_func):
@@ -420,6 +362,46 @@ def admin_required(view_func):
 @app.context_processor
 def inject_admin_flag():
     return {"admin_logged_in": bool(session.get("admin_logged_in"))}
+
+
+def seed_defaults():
+    for key, value in DEFAULT_SETTINGS.items():
+        if not db.session.get(Setting, key):
+            db.session.add(Setting(key=key, value=value))
+
+    if PricingItem.query.count() == 0:
+        for index, (name, price) in enumerate(DEFAULT_PRICING, start=1):
+            db.session.add(PricingItem(position=index, name=name, price=price))
+
+    reviews_seeded = setting_value("_reviews_seeded", "")
+    if not reviews_seeded and Review.query.count() == 0:
+        for author, quote, rating, approved in DEFAULT_REVIEWS:
+            db.session.add(
+                Review(author=author, quote=quote, rating=rating, approved=approved)
+            )
+        set_setting("_reviews_seeded", "1")
+
+    if GalleryCard.query.count() == 0:
+        for index, item in enumerate(DEFAULT_GALLERY, start=1):
+            card = GalleryCard(
+                position=index,
+                type=item["type"],
+                alt=item["alt"],
+                video_url=item["video_url"],
+                poster_url=item["poster_url"],
+            )
+            db.session.add(card)
+            db.session.flush()
+            for media_index, media_url in enumerate(item["media"], start=1):
+                db.session.add(
+                    GalleryMedia(
+                        card_id=card.id,
+                        position=media_index,
+                        media_url=media_url,
+                    )
+                )
+
+    db.session.commit()
 
 
 @app.route("/")
@@ -454,14 +436,10 @@ def submit_review():
         return redirect(url_for("home") + "#avaliacoes")
 
     rating_value = max(1, min(5, int(rating)))
-    get_db().execute(
-        """
-        INSERT INTO reviews (author, quote, rating, approved)
-        VALUES (?, ?, ?, 0)
-        """,
-        (author[:80], quote[:1000], rating_value),
+    db.session.add(
+        Review(author=author[:80], quote=quote[:1000], rating=rating_value, approved=False)
     )
-    get_db().commit()
+    db.session.commit()
     flash("Avaliacao enviada com sucesso", "success")
     return redirect(url_for("home") + "#avaliacoes")
 
@@ -543,7 +521,7 @@ def update_settings():
     for key in form_keys:
         if key in request.form:
             set_setting(key, request.form.get(key, "").strip())
-    get_db().commit()
+    db.session.commit()
     flash("Conteudos e horarios atualizados.", "success")
     return redirect(url_for("admin_dashboard") + "#settings")
 
@@ -551,14 +529,17 @@ def update_settings():
 @app.post("/admin/structure-image")
 @admin_required
 def update_structure_image():
-    image = request.files.get("structure_image")
-    image_url = save_upload(image, "structure", ALLOWED_IMAGE_EXTENSIONS)
+    image_url = save_upload(
+        request.files.get("structure_image"),
+        "structure",
+        ALLOWED_IMAGE_EXTENSIONS,
+    )
     if not image_url:
         flash("Envie uma imagem valida para a estrutura.", "error")
         return redirect(url_for("admin_dashboard") + "#structure")
 
     set_setting("structure_image", image_url)
-    get_db().commit()
+    db.session.commit()
     flash("Imagem da estrutura atualizada.", "success")
     return redirect(url_for("admin_dashboard") + "#structure")
 
@@ -572,13 +553,9 @@ def add_pricing():
         flash("Preencha nome e valor do servico.", "error")
         return redirect(url_for("admin_dashboard") + "#pricing")
 
-    db = get_db()
-    position = db.execute("SELECT COALESCE(MAX(position), 0) + 1 FROM pricing").fetchone()[0]
-    db.execute(
-        "INSERT INTO pricing (position, name, price) VALUES (?, ?, ?)",
-        (position, name, price),
-    )
-    db.commit()
+    position = (db.session.query(db.func.coalesce(db.func.max(PricingItem.position), 0)).scalar() or 0) + 1
+    db.session.add(PricingItem(position=position, name=name, price=price))
+    db.session.commit()
     flash("Servico adicionado.", "success")
     return redirect(url_for("admin_dashboard") + "#pricing")
 
@@ -586,17 +563,20 @@ def add_pricing():
 @app.post("/admin/pricing/<int:item_id>/update")
 @admin_required
 def update_pricing(item_id):
+    item = db.session.get(PricingItem, item_id)
+    if not item:
+        flash("Servico nao encontrado.", "error")
+        return redirect(url_for("admin_dashboard") + "#pricing")
+
     name = request.form.get("name", "").strip()
     price = request.form.get("price", "").strip()
     if not name or not price:
         flash("Preencha nome e valor do servico.", "error")
         return redirect(url_for("admin_dashboard") + "#pricing")
 
-    get_db().execute(
-        "UPDATE pricing SET name = ?, price = ? WHERE id = ?",
-        (name, price, item_id),
-    )
-    get_db().commit()
+    item.name = name
+    item.price = price
+    db.session.commit()
     flash("Servico atualizado.", "success")
     return redirect(url_for("admin_dashboard") + "#pricing")
 
@@ -604,26 +584,24 @@ def update_pricing(item_id):
 @app.post("/admin/pricing/<int:item_id>/delete")
 @admin_required
 def delete_pricing(item_id):
-    get_db().execute("DELETE FROM pricing WHERE id = ?", (item_id,))
-    get_db().commit()
-    flash("Servico removido.", "success")
+    item = db.session.get(PricingItem, item_id)
+    if item:
+        db.session.delete(item)
+        db.session.commit()
+        flash("Servico removido.", "success")
     return redirect(url_for("admin_dashboard") + "#pricing")
 
 
 @app.post("/admin/gallery/<int:card_id>/update")
 @admin_required
 def update_gallery_card(card_id):
-    db = get_db()
-    card = db.execute(
-        "SELECT id, type FROM gallery_cards WHERE id = ?",
-        (card_id,),
-    ).fetchone()
+    card = db.session.get(GalleryCard, card_id)
     if not card:
         flash("Card de galeria nao encontrado.", "error")
         return redirect(url_for("admin_dashboard") + "#gallery")
 
-    card_type = request.form.get("type", card["type"]).strip() or card["type"]
-    alt = request.form.get("alt", "").strip()
+    card.type = request.form.get("type", card.type).strip() or card.type
+    card.alt = request.form.get("alt", "").strip() or card.alt
 
     video_url = request.form.get("video_url", "").strip()
     poster_url = request.form.get("poster_url", "").strip()
@@ -643,35 +621,25 @@ def update_gallery_card(card_id):
     if uploaded_poster:
         poster_url = uploaded_poster
 
-    db.execute(
-        """
-        UPDATE gallery_cards
-        SET type = ?, alt = ?, video_url = ?, poster_url = ?
-        WHERE id = ?
-        """,
-        (card_type, alt, video_url, poster_url, card_id),
-    )
+    card.video_url = video_url
+    card.poster_url = poster_url
 
-    if card_type == "slideshow":
+    if card.type == "slideshow":
         media_urls = [
             line.strip()
             for line in request.form.get("media_urls", "").splitlines()
             if line.strip()
         ]
-        uploaded_images = request.files.getlist("image_files")
-        for image in uploaded_images:
+        for image in request.files.getlist("image_files"):
             saved = save_upload(image, "gallery", ALLOWED_IMAGE_EXTENSIONS)
             if saved:
                 media_urls.append(saved)
 
-        db.execute("DELETE FROM gallery_media WHERE card_id = ?", (card_id,))
+        GalleryMedia.query.filter_by(card_id=card.id).delete()
         for index, media_url in enumerate(media_urls, start=1):
-            db.execute(
-                "INSERT INTO gallery_media (card_id, position, media_url) VALUES (?, ?, ?)",
-                (card_id, index, media_url),
-            )
+            db.session.add(GalleryMedia(card_id=card.id, position=index, media_url=media_url))
 
-    db.commit()
+    db.session.commit()
     flash("Card da galeria atualizado.", "success")
     return redirect(url_for("admin_dashboard") + "#gallery")
 
@@ -679,15 +647,10 @@ def update_gallery_card(card_id):
 @app.post("/admin/reviews/<int:review_id>/toggle")
 @admin_required
 def toggle_review(review_id):
-    db = get_db()
-    row = db.execute(
-        "SELECT approved FROM reviews WHERE id = ?",
-        (review_id,),
-    ).fetchone()
-    if row:
-        new_value = 0 if row["approved"] else 1
-        db.execute("UPDATE reviews SET approved = ? WHERE id = ?", (new_value, review_id))
-        db.commit()
+    review = db.session.get(Review, review_id)
+    if review:
+        review.approved = not review.approved
+        db.session.commit()
         flash("Status da avaliacao atualizado.", "success")
     return redirect(url_for("admin_dashboard") + "#reviews")
 
@@ -695,14 +658,17 @@ def toggle_review(review_id):
 @app.post("/admin/reviews/<int:review_id>/delete")
 @admin_required
 def delete_review(review_id):
-    get_db().execute("DELETE FROM reviews WHERE id = ?", (review_id,))
-    get_db().commit()
-    flash("Avaliacao removida.", "success")
+    review = db.session.get(Review, review_id)
+    if review:
+        db.session.delete(review)
+        db.session.commit()
+        flash("Avaliacao removida.", "success")
     return redirect(url_for("admin_dashboard") + "#reviews")
 
 
 with app.app_context():
-    init_db()
+    db.create_all()
+    seed_defaults()
 
 
 if __name__ == "__main__":

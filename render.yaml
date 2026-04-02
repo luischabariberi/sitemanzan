@@ -1,3 +1,7 @@
+databases:
+  - name: manzanbarber-db
+    plan: free
+
 services:
   - type: web
     name: manzanbarber
@@ -5,3 +9,12 @@ services:
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: manzanbarber-db
+          property: connectionString
+      - key: ADMIN_PASSWORD
+        value: admin123
+      - key: FLASK_SECRET_KEY
+        generateValue: true
