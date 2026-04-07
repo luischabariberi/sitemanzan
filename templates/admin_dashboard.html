@@ -34,14 +34,57 @@
 
     <main class="admin-layout">
         <aside class="admin-sidebar">
-            <a href="#settings">Informacoes</a>
-            <a href="#structure">Estrutura</a>
-            <a href="#pricing">Servicos</a>
-            <a href="#gallery">Galeria</a>
-            <a href="#reviews">Comentarios</a>
+            <div class="admin-sidebar__group">
+                <span class="admin-sidebar__title">Navegacao</span>
+                <a href="#overview">Visao geral</a>
+                <a href="#settings">Informacoes</a>
+                <a href="#structure">Estrutura</a>
+                <a href="#pricing">Servicos</a>
+                <a href="#gallery">Galeria</a>
+                <a href="#reviews">Comentarios</a>
+            </div>
+            <div class="admin-sidebar__group admin-sidebar__group--small">
+                <span class="admin-sidebar__title">Acesso rapido</span>
+                <a href="{{ url_for('home') }}" target="_blank" rel="noreferrer">Abrir site</a>
+                <a href="#pricing">Editar tabela</a>
+                <a href="#gallery">Trocar midias</a>
+            </div>
         </aside>
 
         <section class="admin-content">
+            <section class="admin-section admin-section--overview" id="overview">
+                <div class="admin-section__header">
+                    <div>
+                        <span class="admin-eyebrow">Painel inteligente</span>
+                        <h2>Edite o site sem mexer em codigo</h2>
+                    </div>
+                    <p class="admin-hint">Tudo que voce salvar aqui atualiza o site. Textos, servicos e comentarios ficam no banco. Imagens e videos enviados agora podem ir para o Cloudinary.</p>
+                </div>
+
+                <div class="admin-stats">
+                    <article class="admin-stat-card">
+                        <span class="admin-stat-card__label">Servicos ativos</span>
+                        <strong>{{ pricing|length }}</strong>
+                        <a href="#pricing">Gerenciar servicos</a>
+                    </article>
+                    <article class="admin-stat-card">
+                        <span class="admin-stat-card__label">Cards da galeria</span>
+                        <strong>{{ gallery|length }}</strong>
+                        <a href="#gallery">Atualizar galeria</a>
+                    </article>
+                    <article class="admin-stat-card">
+                        <span class="admin-stat-card__label">Comentarios recebidos</span>
+                        <strong>{{ reviews|length }}</strong>
+                        <a href="#reviews">Moderar comentarios</a>
+                    </article>
+                    <article class="admin-stat-card">
+                        <span class="admin-stat-card__label">Horario atual</span>
+                        <strong>{{ business.hours_week }}</strong>
+                        <a href="#settings">Editar horario</a>
+                    </article>
+                </div>
+            </section>
+
             <section class="admin-section" id="settings">
                 <div class="admin-section__header">
                     <div>
@@ -52,76 +95,79 @@
                 </div>
 
                 <form method="post" action="{{ url_for('update_settings') }}" class="admin-grid-form">
-                    <label>
+                    <label class="admin-field">
                         <span>Nome do negocio</span>
+                        <small>Esse nome aparece em pontos principais do site.</small>
                         <input type="text" name="business_name" value="{{ business.name }}">
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Texto principal do hero</span>
+                        <small>Mensagem de destaque logo na abertura do site.</small>
                         <input type="text" name="badge" value="{{ business.badge }}">
                     </label>
-                    <label class="admin-grid-form__full">
+                    <label class="admin-grid-form__full admin-field">
                         <span>Descricao principal</span>
+                        <small>Texto curto abaixo da logo principal.</small>
                         <textarea name="description" rows="3">{{ business.description }}</textarea>
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Endereco</span>
                         <input type="text" name="address" value="{{ business.address }}">
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Horario semana</span>
                         <input type="text" name="hours_week" value="{{ business.hours_week }}">
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Horario sabado</span>
                         <input type="text" name="hours_sat" value="{{ business.hours_sat }}">
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Horario domingo</span>
                         <input type="text" name="hours_sun" value="{{ business.hours_sun }}">
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Link WhatsApp</span>
                         <input type="url" name="whatsapp_link" value="{{ business.whatsapp_link }}">
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Link agendamento</span>
                         <input type="url" name="horario_link" value="{{ business.horario_link }}">
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Link mapa</span>
                         <input type="url" name="maps_link" value="{{ business.maps_link }}">
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Titulo oferta</span>
                         <input type="text" name="offer_title" value="{{ business.offer_title }}">
                     </label>
-                    <label>
+                    <label class="admin-field">
                         <span>Texto botao portfolio</span>
                         <input type="text" name="hero_cta" value="{{ business.hero_cta }}">
                     </label>
-                    <label class="admin-grid-form__full">
+                    <label class="admin-grid-form__full admin-field">
                         <span>Texto da oferta</span>
                         <textarea name="offer_text" rows="2">{{ business.offer_text }}</textarea>
                     </label>
 
-                    <label>
+                    <label class="admin-field">
                         <span>Sobre mim - topo</span>
                         <input type="text" name="about_eyebrow" value="{{ about_me.eyebrow }}">
                     </label>
-                    <label class="admin-grid-form__full">
+                    <label class="admin-grid-form__full admin-field">
                         <span>Sobre mim - titulo</span>
                         <textarea name="about_title" rows="2">{{ about_me.title }}</textarea>
                     </label>
-                    <label class="admin-grid-form__full">
+                    <label class="admin-grid-form__full admin-field">
                         <span>Sobre mim - paragrafo 1</span>
                         <textarea name="about_paragraph_1" rows="3">{{ about_me.paragraphs[0] }}</textarea>
                     </label>
-                    <label class="admin-grid-form__full">
+                    <label class="admin-grid-form__full admin-field">
                         <span>Sobre mim - paragrafo 2</span>
                         <textarea name="about_paragraph_2" rows="3">{{ about_me.paragraphs[1] }}</textarea>
                     </label>
-                    <label class="admin-grid-form__full">
+                    <label class="admin-grid-form__full admin-field">
                         <span>Sobre mim - paragrafo 3</span>
                         <textarea name="about_paragraph_3" rows="3">{{ about_me.paragraphs[2] }}</textarea>
                     </label>
@@ -139,12 +185,12 @@
                 </div>
 
                 <form method="post" action="{{ url_for('update_settings') }}" class="admin-grid-form">
-                    <label class="admin-grid-form__full">
+                    <label class="admin-grid-form__full admin-field">
                         <span>Titulo da estrutura</span>
                         <textarea name="structure_title" rows="2">{{ structure.title }}</textarea>
                     </label>
                     {% for highlight in structure.highlights %}
-                    <label class="admin-grid-form__full">
+                    <label class="admin-grid-form__full admin-field">
                         <span>Destaque {{ loop.index }}</span>
                         <input type="text" name="structure_highlight_{{ loop.index }}" value="{{ highlight }}">
                     </label>
@@ -153,12 +199,13 @@
                 </form>
 
                 <form method="post" action="{{ url_for('update_structure_image') }}" enctype="multipart/form-data" class="admin-upload-form">
-                    <div>
+                    <div class="admin-upload-preview">
                         <span class="admin-eyebrow">Foto atual</span>
                         <img src="{{ structure.image }}" alt="Foto da estrutura" class="admin-preview">
                     </div>
-                    <label>
+                    <label class="admin-field">
                         <span>Nova foto da estrutura</span>
+                        <small>Escolha uma imagem vertical ou horizontal em boa qualidade.</small>
                         <input type="file" name="structure_image" accept="image/*" required>
                     </label>
                     <button type="submit" class="admin-submit">Atualizar foto</button>
@@ -177,6 +224,7 @@
                     {% for item in pricing %}
                     <div class="admin-pricing-row">
                         <form method="post" action="{{ url_for('update_pricing', item_id=item.id) }}" class="admin-inline-form">
+                            <span class="admin-order-badge">{{ loop.index }}</span>
                             <input type="text" name="name" value="{{ item.name }}" required>
                             <input type="text" name="price" value="{{ item.price }}" required>
                             <button type="submit">Salvar</button>
@@ -189,6 +237,7 @@
                 </div>
 
                 <form method="post" action="{{ url_for('add_pricing') }}" class="admin-inline-form admin-inline-form--add">
+                    <span class="admin-order-badge admin-order-badge--new">+</span>
                     <input type="text" name="name" placeholder="Novo servico" required>
                     <input type="text" name="price" placeholder="R$0,00" required>
                     <button type="submit">Adicionar</button>
@@ -206,43 +255,60 @@
                 <div class="admin-gallery-grid">
                     {% for card in gallery %}
                     <form method="post" action="{{ url_for('update_gallery_card', card_id=card.id) }}" enctype="multipart/form-data" class="admin-gallery-card">
-                        <h3>Card {{ loop.index }}</h3>
-                        <label>
+                        <div class="admin-gallery-card__top">
+                            <h3>Card {{ loop.index }}</h3>
+                            <span class="admin-gallery-tag">{{ "Video" if card.type == "video" else "Fotos" }}</span>
+                        </div>
+                        <label class="admin-field">
                             <span>Tipo</span>
                             <select name="type">
                                 <option value="slideshow" {% if card.type == 'slideshow' %}selected{% endif %}>Fotos rotativas</option>
                                 <option value="video" {% if card.type == 'video' %}selected{% endif %}>Video</option>
                             </select>
                         </label>
-                        <label>
+                        <label class="admin-field">
                             <span>Texto alternativo</span>
                             <input type="text" name="alt" value="{{ card.alt }}">
                         </label>
 
                         {% if card.type == 'slideshow' %}
-                        <label>
+                        <div class="admin-mini-gallery">
+                            {% for image in card.images[:3] %}
+                            <img src="{{ image }}" alt="Preview {{ loop.index }}">
+                            {% endfor %}
+                        </div>
+                        <label class="admin-field">
                             <span>URLs das fotos (uma por linha)</span>
+                            <small>Voce pode manter links existentes e adicionar novos.</small>
                             <textarea name="media_urls" rows="6">{% for image in card.images %}{{ image }}{% if not loop.last %}
 {% endif %}{% endfor %}</textarea>
                         </label>
-                        <label>
+                        <label class="admin-field">
                             <span>Adicionar fotos</span>
                             <input type="file" name="image_files" accept="image/*" multiple>
                         </label>
                         {% else %}
-                        <label>
+                        <div class="admin-video-preview">
+                            {% if card.poster %}
+                            <img src="{{ card.poster }}" alt="Capa do video">
+                            {% endif %}
+                            {% if card.video %}
+                            <a href="{{ card.video }}" target="_blank" rel="noreferrer">Abrir video atual</a>
+                            {% endif %}
+                        </div>
+                        <label class="admin-field">
                             <span>URL do video</span>
                             <input type="url" name="video_url" value="{{ card.video }}">
                         </label>
-                        <label>
+                        <label class="admin-field">
                             <span>Upload de video</span>
                             <input type="file" name="video_file" accept="video/*">
                         </label>
-                        <label>
+                        <label class="admin-field">
                             <span>URL da capa</span>
                             <input type="url" name="poster_url" value="{{ card.poster }}">
                         </label>
-                        <label>
+                        <label class="admin-field">
                             <span>Upload da capa</span>
                             <input type="file" name="poster_file" accept="image/*">
                         </label>
@@ -264,9 +330,12 @@
 
                 <div class="admin-review-list">
                     {% for review in reviews %}
-                    <article class="admin-review-card">
+                    <article class="admin-review-card {% if review.approved %}admin-review-card--approved{% else %}admin-review-card--pending{% endif %}">
                         <div class="admin-review-card__top">
-                            <strong>{{ review.author }}</strong>
+                            <div>
+                                <strong>{{ review.author }}</strong>
+                                <span class="admin-review-card__meta">{{ "Aprovado" if review.approved else "Pendente" }}</span>
+                            </div>
                             <span>{{ review.rating }} estrelas</span>
                         </div>
                         <p>{{ review.quote }}</p>
