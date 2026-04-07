@@ -3,6 +3,8 @@ import uuid
 from functools import wraps
 from pathlib import Path
 
+import cloudinary
+import cloudinary.uploader
 from flask import (
     Flask,
     flash,
@@ -23,6 +25,23 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 ALLOWED_VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".m4v"}
+
+
+def cloudinary_is_configured():
+    return bool(
+        os.environ.get("CLOUDINARY_CLOUD_NAME")
+        and os.environ.get("CLOUDINARY_API_KEY")
+        and os.environ.get("CLOUDINARY_API_SECRET")
+    )
+
+
+if cloudinary_is_configured():
+    cloudinary.config(
+        cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        api_key=os.environ.get("CLOUDINARY_API_KEY"),
+        api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+        secure=True,
+    )
 
 DEFAULT_SETTINGS = {
     "business_name": "Manzan Barber",
@@ -220,6 +239,16 @@ def save_upload(file_storage, folder_name, allowed_extensions):
     suffix = Path(filename).suffix.lower()
     if suffix not in allowed_extensions:
         return None
+
+    if cloudinary_is_configured():
+        upload_options = {
+            "folder": f"manzanbarber/{folder_name}",
+            "resource_type": "video" if allowed_extensions == ALLOWED_VIDEO_EXTENSIONS else "image",
+            "public_id": uuid.uuid4().hex,
+            "overwrite": True,
+        }
+        uploaded = cloudinary.uploader.upload(file_storage, **upload_options)
+        return uploaded.get("secure_url")
 
     target_dir = UPLOAD_DIR / folder_name
     target_dir.mkdir(parents=True, exist_ok=True)
