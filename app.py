@@ -635,25 +635,16 @@ def update_gallery_card(card_id):
     card.alt = request.form.get("alt", "").strip() or card.alt
 
     video_url = request.form.get("video_url", "").strip()
-    poster_url = request.form.get("poster_url", "").strip()
 
     uploaded_video = save_upload(
         request.files.get("video_file"),
         "gallery",
         ALLOWED_VIDEO_EXTENSIONS,
     )
-    uploaded_poster = save_upload(
-        request.files.get("poster_file"),
-        "gallery",
-        ALLOWED_IMAGE_EXTENSIONS,
-    )
     if uploaded_video:
         video_url = uploaded_video
-    if uploaded_poster:
-        poster_url = uploaded_poster
 
     card.video_url = video_url
-    card.poster_url = poster_url
 
     if card.type == "slideshow":
         media_urls = [

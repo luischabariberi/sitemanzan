@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Language" content="pt-BR">
     <meta name="language" content="Portuguese">
     <meta name="viewport" content="width=1000">
-    <title>{{ business.name }} | Exodo Barbearia - Manzan</title>
+    <title>{{ business.name }} | Êxodo Barbearia - Manzan</title>
     <meta
         name="description"
         content="{{ business.name }} entrega uma experiencia premium com corte, barba e atendimento pensado para homens que valorizam presenca."
@@ -53,8 +53,8 @@
 
             <nav class="site-nav">
                 <a href="#sobremim">Sobre Mim</a>
-                <a href="#servicos">Servicos</a>
-                <a href="#portifolio">Portifolio</a>
+                <a href="#servicos">Serviços</a>
+                <a href="#portifolio">Portfólio</a>
                 <a href="#contato">Contato</a>
             </nav>
 
@@ -74,7 +74,7 @@
 
                     <div class="hero__actions">
                         <a class="button" href="#portifolio">{{ business.hero_cta }}</a>
-                        <a class="button button--secondary" href="{{ business.horario_link }}">Agende seu horario</a>
+                        <a class="button button--secondary" href="{{ business.horario_link }}">Agende seu horário</a>
                     </div>
                 </div>
             </section>
@@ -98,14 +98,14 @@
                         {% endfor %}
                     </div>
 
-                    <a class="button" href="{{ business.horario_link }}">Agende seu horario</a>
+                    <a class="button" href="{{ business.horario_link }}">Agende seu horário</a>
                 </div>
             </section>
 
             <section class="section values-section" id="servicos">
                 <div class="section-heading reveal">
-                    <span class="eyebrow">Servicos e valores</span>
-                    <h2>Escolha o servico ideal para o seu estilo.</h2>
+                    <span class="eyebrow">Serviços e valores</span>
+                    <h2>Escolha o serviço ideal para o seu estilo.</h2>
                 </div>
 
                 <div class="pricing-grid">
@@ -134,17 +134,17 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <a class="button" href="{{ business.horario_link }}">Reservar horario</a>
+                    <a class="button" href="{{ business.horario_link }}">Reservar horário</a>
                 </div>
             </section>
 
             <section class="section offer-section reveal">
                 <div class="offer-section__content">
-                    <span class="eyebrow">O que faz a diferenca</span>
+                    <span class="eyebrow">O que faz a diferença</span>
                     <h2>{{ business.offer_title }}</h2>
                     <p>{{ business.offer_text|capitalize }}</p>
                 </div>
-                <a class="button button--light" href="{{ business.horario_link }}">Agendar experiencia</a>
+                <a class="button button--light" href="{{ business.horario_link }}">Agendar experiência</a>
             </section>
 
             <section class="section gallery-section" id="portifolio">
@@ -184,8 +184,8 @@
 
             <section class="section testimonials-section" id="avaliacoes">
                 <div class="section-heading reveal">
-                    <span class="eyebrow">Quem ja veio volta</span>
-                    <h2>Qualidade de servico e atendimento de excelencia fazem o cliente voltar.</h2>
+                    <span class="eyebrow">Quem já veio volta</span>
+                    <h2>Qualidade de serviço e atendimento de excelência fazem o cliente voltar.</h2>
                 </div>
 
                 <div class="testimonials-grid">
@@ -199,8 +199,8 @@
 
                 <form class="review-form reveal" action="{{ url_for('submit_review') }}" method="post">
                     <div class="review-form__header">
-                        <span class="eyebrow">Deixe sua avaliacao</span>
-                        <h3>Conte como foi sua experiencia na barbearia.</h3>
+                        <span class="eyebrow">Deixe sua avaliação</span>
+                        <h3>Conte como foi sua experiência na barbearia.</h3>
                     </div>
 
                     <input
@@ -231,14 +231,14 @@
                         placeholder="Digite aqui seu comentario..."
                     ></textarea>
 
-                    <button type="submit" class="button">Enviar avaliacao</button>
+                    <button type="submit" class="button">Enviar avaliação</button>
                 </form>
             </section>
 
             <section class="section contact-section" id="contato">
                 <div class="contact-card reveal">
-                    <span class="eyebrow">Localizacao</span>
-                    <h2>Agende seu horario e viva uma experiência de barbearia completa.</h2>
+                    <span class="eyebrow">Localização</span>
+                    <h2>Agende seu horário e viva uma experiência de barbearia completa.</h2>
                     <p>{{ business.address }}</p>
                     <ul class="contact-list">
                         <li>{{ business.hours_week }}</li>

@@ -35,19 +35,19 @@
     <main class="admin-layout">
         <aside class="admin-sidebar">
             <div class="admin-sidebar__group">
-                <span class="admin-sidebar__title">Navegacao</span>
-                <a href="#overview">Visao geral</a>
-                <a href="#settings">Informacoes</a>
+                <span class="admin-sidebar__title">Navegação</span>
+                <a href="#overview">Visão geral</a>
+                <a href="#settings">Informações</a>
                 <a href="#structure">Estrutura</a>
-                <a href="#pricing">Servicos</a>
+                <a href="#pricing">Serviços</a>
                 <a href="#gallery">Galeria</a>
-                <a href="#reviews">Comentarios</a>
+                <a href="#reviews">Comentários</a>
             </div>
             <div class="admin-sidebar__group admin-sidebar__group--small">
-                <span class="admin-sidebar__title">Acesso rapido</span>
+                <span class="admin-sidebar__title">Acesso rápido</span>
                 <a href="{{ url_for('home') }}" target="_blank" rel="noreferrer">Abrir site</a>
                 <a href="#pricing">Editar tabela</a>
-                <a href="#gallery">Trocar midias</a>
+                <a href="#gallery">Trocar mídias</a>
             </div>
         </aside>
 
@@ -56,9 +56,9 @@
                 <div class="admin-section__header">
                     <div>
                         <span class="admin-eyebrow">Painel inteligente</span>
-                        <h2>Edite o site sem mexer em codigo</h2>
+                        <h2>Edite o site sem mexer em código</h2>
                     </div>
-                    <p class="admin-hint">Tudo que voce salvar aqui atualiza o site. Textos, servicos e comentarios ficam no banco. Imagens e videos enviados agora podem ir para o Cloudinary.</p>
+                    <p class="admin-hint">Tudo que você salvar aqui atualiza o site. Textos, servicos e comentarios ficam no banco. Imagens e videos enviados agora podem ir para o Cloudinary.</p>
                 </div>
 
                 <div class="admin-stats">
@@ -289,9 +289,6 @@
                         </label>
                         {% else %}
                         <div class="admin-video-preview">
-                            {% if card.poster %}
-                            <img src="{{ card.poster }}" alt="Capa do video">
-                            {% endif %}
                             {% if card.video %}
                             <a href="{{ card.video }}" target="_blank" rel="noreferrer">Abrir video atual</a>
                             {% endif %}
@@ -303,14 +300,6 @@
                         <label class="admin-field">
                             <span>Upload de video</span>
                             <input type="file" name="video_file" accept="video/*">
-                        </label>
-                        <label class="admin-field">
-                            <span>URL da capa</span>
-                            <input type="url" name="poster_url" value="{{ card.poster }}">
-                        </label>
-                        <label class="admin-field">
-                            <span>Upload da capa</span>
-                            <input type="file" name="poster_file" accept="image/*">
                         </label>
                         {% endif %}
 
